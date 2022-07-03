@@ -1,70 +1,84 @@
+import React from 'react';
 import './App.scss';
 import TodoList from './TodoList'
 import Footer from './Footer'
-import {useState, useCallback} from 'react';
 
-function App() {
-    const [todoList, setTodoList] = useState([])
-    const [numOfActive, setNumOfActive] = useState(0)
-    const [currentFilter, setCurrentFilter] = useState('all')
-    const [id, setId] = useState(0)
+class App extends React.Component {
 
-    const handleAddTodo = (description) => {
-        const todo = { id: id, description: description, completed: false}
-        setTodoList([...todoList, todo])
-        setNumOfActive(numOfActive+1)
-        setId(id+1)
+    constructor(props) {
+        super(props);
+        this.state = { todoList: [], numOfActive: 0, currentFilter: 'all', id: 0 };
+        this.handleAddTodo = this.handleAddTodo.bind(this);
+        this.handleComplete = this.handleComplete.bind(this);
+        this.handleRemove = this.handleRemove.bind(this);
+        this.handleClearCompleted = this.handleClearCompleted.bind(this);
+        this.handleFilterChanged = this.handleFilterChanged.bind(this);
     }
 
-    const handleComplete = (id) => {
-        const updated = todoList.map(todo => {
+    handleAddTodo = (description) => {
+        const todo = { id: this.state.id, description: description, completed: false}
+        this.setState({
+            todoList: [...this.state.todoList, todo],
+            numOfActive: this.state.numOfActive + 1,
+            id: this.state.id + 1 })
+    }
+
+    handleComplete = (id) => {
+        const updated = this.state.todoList.map(todo => {
             if(todo.id === id) return {...todo, completed: !todo.completed}
             return todo
         })
-        setTodoList(updated)
-        setNumOfActive(numOfActive-1)
+        this.setState({
+            todoList: updated,
+            numOfActive: this.state.numOfActive - 1
+        })
     }
 
-    const handleRemove = (id) => {
-        const updated = todoList.filter(todo => todo.id !== id)
-        const removeActive = todoList.find(todo => todo.id === id)?.completed === false
-        setTodoList(updated)
-        if (!!removeActive) setNumOfActive(numOfActive - 1)
+    handleRemove = (id) => {
+        const updated = this.state.todoList.filter(todo => todo.id !== id)
+        const removeActive = this.state.todoList.find(todo => todo.id === id)?.completed === false
+       this.setState({
+           todoList: updated,
+           numOfActive: !!removeActive ? this.state.numOfActive - 1 : this.state.numOfActive }
+       )
     }
 
-    const handleClearCompleted = () => {
-        const updated = todoList.filter(todo => todo.completed === false)
-        setTodoList(updated)
-    }
+    handleClearCompleted = () => {
+        const updated = this.state.todoList.filter(todo => todo.completed === false)
+        this.setState({  todoList: updated })
+        }
 
-    const handleFilterChanged = (name) => setCurrentFilter(name)
+    handleFilterChanged = (name) =>  this.setState({ currentFilter: name })
 
-    const applyFilter = useCallback(() => {
-        switch(currentFilter) {
+    applyFilter = () => {
+        switch(this.state.currentFilter) {
             case 'all':
-                return todoList
+                return this.state.todoList
             case 'complete':
-                return todoList.filter(todo => todo.completed === true)
+                return this.state.todoList.filter(todo => todo.completed === true)
             case 'active': {
-                return todoList.filter(todo => todo.completed === false)
+                return this.state.todoList.filter(todo => todo.completed === false)
             }
             default:
-                return todoList
+                return this.state.todoList
         }
-    },[todoList, currentFilter])
+    }
 
-    return (
-        <div className="app">
-            <h1 className='header'>Todos</h1>
-            <TodoList
-                todoList={applyFilter()}
-                onAddTodo={handleAddTodo}
-                onCompleteTodo={handleComplete}
-                onRemoveTodo={handleRemove}
-            />
-            <Footer activeTodos={numOfActive} onClearComplete={handleClearCompleted} onFilterChanged={handleFilterChanged}/>
-        </div>
-    );
+    render() {
+        return (
+            <div className="app">
+                <h1 className='header'>Todos</h1>
+                <TodoList
+                    todoList={this.applyFilter()}
+                    onAddTodo={this.handleAddTodo}
+                    onCompleteTodo={this.handleComplete}
+                    onRemoveTodo={this.handleRemove}
+                />
+                <Footer activeTodos={this.state.numOfActive} onClearComplete={this.handleClearCompleted}
+                        onFilterChanged={this.handleFilterChanged}/>
+            </div>
+        )
+    }
 }
 
 export default App;

@@ -1,44 +1,65 @@
 import './Todo.scss';
 import classNames from "classnames";
-import { useState } from 'react'
+import React from 'react'
+import PropTypes from "prop-types";
 
-function Todo({ id, description, completed, onComplete, onRemove }) {
-    const [removeVisible, setRemoveVisible] = useState(false)
+class Todo extends React.Component {
 
-    const handleCheck = (e) => {
-        onComplete(Number(e.target.id))
+    constructor(props) {
+        super(props);
+        this.state = { removeVisible: false }
+        this.handleCheck = this.handleCheck.bind(this)
+        this.handleClick = this.handleClick.bind(this)
+        this.handleShow = this.handleShow.bind(this)
+        this.handleHide = this.handleHide.bind(this)
     }
 
-    const handleClick = (e) => {
-        onRemove(Number(e.target.id))
+    handleCheck = (e) => {
+        this.props.onComplete(Number(e.target.id))
     }
 
-    const handleShow = () => {
-        setRemoveVisible(true)
-    }
-    const handleHide = () => {
-        setRemoveVisible(false)
+    handleClick = (e) => {
+        this.props.onRemove(Number(e.target.id))
     }
 
-    return (
-        <div className='container' onMouseEnter={handleShow} onMouseLeave={handleHide}>
-            <div className='todo'>
-              <input
-                  type='checkbox'
-                  id={id}
-                  className={classNames({toggle: true, checked: completed})}
-                  checked={completed}
-                  onChange={handleCheck}
-              />
-              <label className={classNames({description: true, complete: completed})}>{description}</label>
+    handleShow = () => {
+        this.setState({ removeVisible: true })
+    }
+    handleHide = () => {
+        this.setState({ removeVisible: false })
+    }
+
+    render() {
+        const { id, description, completed } = this.props
+        return (
+            <div className='container' onMouseEnter={this.handleShow} onMouseLeave={this.handleHide}>
+                <div className='todo'>
+                    <input
+                        type='checkbox'
+                        id={id}
+                        className={classNames({toggle: true, checked: completed})}
+                        checked={completed}
+                        onChange={this.handleCheck}
+                    />
+                    <label className={classNames({description: true, complete: completed})}>{description}</label>
+                </div>
+                <button
+                    id={id}
+                    className={classNames({remove: true, show: this.state.removeVisible || completed})}
+                    onClick={this.handleClick}
+                >x
+                </button>
             </div>
-            <button
-                id={id}
-                className={classNames({remove: true, show: removeVisible || completed})}
-                onClick={handleClick}
-            >x</button>
-        </div>
-    );
+        )
+    }
+}
+
+Todo.Props = {
+    id: PropTypes.number,
+    description: PropTypes.string,
+    completed: PropTypes.bool,
+    onComplete: PropTypes.func,
+    onRemove: PropTypes.func,
 }
 
 export default Todo;

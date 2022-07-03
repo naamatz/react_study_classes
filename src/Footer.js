@@ -1,35 +1,53 @@
-import './Footer.scss';
-import classNames from "classnames";
-import { useState } from 'react'
+import './Footer.scss'
+import classNames from "classnames"
+import React from 'react'
+import PropTypes from "prop-types"
 
-function Footer({ activeTodos, onFilterChanged, onClearComplete}) {
-    const [activeFilter, setActiveFilter] = useState('all')
-    const isActiveFilter = (name) => activeFilter ===  name
-    const handleChooseFilter = (e) => {
-        setActiveFilter(e.target.name)
-        onFilterChanged(e.target.name)
+class Footer extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { activeFilter: 'all' }
+        this.handleChooseFilter = this.handleChooseFilter.bind(this)
+        this.isActiveFilter = this.isActiveFilter.bind(this)
     }
 
-    return (
-        <footer className='footer'>
-            <label className='active-num'>{`${activeTodos} ${activeTodos === 1 ? 'item' : 'items'} left`}</label>
-            <div className='filters'>
-                {[
-                    { name: 'all', label: 'All' },
-                    { name: 'active', label: 'Active' },
-                    { name: 'complete', label: 'Completed' }
-                ].map(item =>
-                    <button
-                        name={item.name}
-                        className={classNames({filter: true, disabled: !isActiveFilter(item.name)})}
-                        onClick={handleChooseFilter}
-                    >{item.label}
-                    </button>
-                )}
-            </div>
-            <button className='clear' onClick={onClearComplete}>Clear completed</button>
-        </footer>
-    );
+
+    isActiveFilter = (name) => this.state.activeFilter ===  name
+
+    handleChooseFilter = (e) => {
+        this.setState({ activeFilter: e.target.name })
+        this.props.onFilterChanged(e.target.name)
+    }
+
+    render() {
+        return (
+            <footer className='footer'>
+                <label className='active-num'>{`${this.state.activeTodos} ${this.state.activeTodos === 1 ? 'item' : 'items'} left`}</label>
+                <div className='filters'>
+                    {[
+                        { name: 'all', label: 'All' },
+                        { name: 'active', label: 'Active' },
+                        { name: 'complete', label: 'Completed' }
+                    ].map(item =>
+                        <button
+                            name={item.name}
+                            className={classNames({filter: true, disabled: !this.isActiveFilter(item.name)})}
+                            onClick={this.handleChooseFilter}
+                        >{item.label}
+                        </button>
+                    )}
+                </div>
+                <button className='clear' onClick={this.props.onClearComplete}>Clear completed</button>
+            </footer>
+        )
+    }
+
+}
+
+Footer.Props = {
+    activeTodos: PropTypes.number,
+    onFilterChanged: PropTypes.func,
+    onClearComplete: PropTypes.func
 }
 
 export default Footer;

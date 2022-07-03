@@ -1,52 +1,70 @@
-import './TodoList.scss';
-import { useState } from 'react'
+import React from 'react'
+import './TodoList.scss'
 import Todo from './Todo'
+import PropTypes from "prop-types";
 
 
-function TodoList({ todoList, onAddTodo, onCompleteTodo, onRemoveTodo }) {
-    const [newTodo, setNewTodo] = useState("")
+class TodoList extends React.Component {
 
-    const handleAddTodo = (e) => {
-        if (e.key === "Enter") {
-            onAddTodo(e.target.value)
-            setNewTodo("")
-        }
+    constructor(props) {
+        super(props);
+        this.state = { newTodo: "" }
+        this.handleAddTodo = this.handleAddTodo.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.handleComplete = this.handleComplete.bind(this)
+        this.handleRemove = this.handleRemove.bind(this)
     }
 
-    const handleChange = (e) => {
-        setNewTodo(e.target.value)
+     handleAddTodo = (e) => {
+         if (e.key === "Enter") {
+             this.props.onAddTodo(e.target.value)
+             this.setState({newTodo: ""})
+         }
+     }
+
+     handleChange = (e) => {
+            this.setState({ newTodo: e.target.value })
+     }
+
+     handleComplete = (id) => {
+        this.props.onCompleteTodo(id)
     }
 
-    const handleComplete = (id) => {
-        onCompleteTodo(id)
+     handleRemove = (id) => {
+        this.props.onRemoveTodo(id)
     }
 
-    const handleRemove = (id) => {
-        onRemoveTodo(id)
+    render() {
+        return (
+            <div className='todolist'>
+                <input
+                    type='text'
+                    className='new-todo'
+                    onKeyUp={this.handleAddTodo}
+                    onChange={this.handleChange}
+                    placeholder='What needs to be done?'
+                    value={this.state.newTodo}
+                />
+                {this.state.todoList.map(todo => (
+                    <Todo
+                        key={`todo_${todo.id}`}
+                        id={todo.id}
+                        completed={todo.completed}
+                        description={todo.description}
+                        onComplete={this.handleComplete}
+                        onRemove={this.handleRemove}
+                    />))
+                }
+            </div>
+        )
     }
+}
 
-    return (
-        <div className='todolist'>
-            <input
-                type='text'
-                className='new-todo'
-                onKeyUp={handleAddTodo}
-                onChange={handleChange}
-                placeholder='What needs to be done?'
-                value={newTodo}
-            />
-            {todoList.map(todo => (
-                <Todo
-                    key={`todo_${todo.id}`}
-                    id={todo.id}
-                    completed={todo.completed}
-                    description={todo.description}
-                    onComplete={handleComplete}
-                    onRemove={handleRemove}
-                />))
-            }
-        </div>
-    );
+TodoList.Props = {
+    todoList: PropTypes.array,
+    onAddTodo: PropTypes.func,
+    onCompleteTodo: PropTypes.func,
+    onRemoveTodo: PropTypes.func
 }
 
 export default TodoList;
