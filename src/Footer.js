@@ -30,6 +30,7 @@ class Footer extends React.Component {
                         { name: 'complete', label: 'Completed' }
                     ].map(item =>
                         <button
+                            key={item.name}
                             name={item.name}
                             className={classNames({filter: true, disabled: !this.isActiveFilter(item.name)})}
                             onClick={this.handleChooseFilter}

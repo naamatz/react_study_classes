@@ -13,6 +13,7 @@ class App extends React.Component {
         this.handleRemove = this.handleRemove.bind(this);
         this.handleClearCompleted = this.handleClearCompleted.bind(this);
         this.handleFilterChanged = this.handleFilterChanged.bind(this);
+        this.applyFilter = this.applyFilter.bind(this)
     }
 
     handleAddTodo = (description) => {

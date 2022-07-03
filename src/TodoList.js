@@ -45,7 +45,7 @@ class TodoList extends React.Component {
                     placeholder='What needs to be done?'
                     value={this.state.newTodo}
                 />
-                {this.state.todoList.map(todo => (
+                {this.props.todoList.map(todo => (
                     <Todo
                         key={`todo_${todo.id}`}
                         id={todo.id}
